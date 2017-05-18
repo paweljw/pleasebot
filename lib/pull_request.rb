@@ -1,13 +1,14 @@
+# frozen_string_literal: true
+
+require_relative './validators/pull_request_validator'
+
 class PullRequest
-  def initialize(repo, data, redis, octokit)
+  def initialize(data)
     @data = data
-    @repo = repo
-    @redis = redis
-    @octokit = octokit
   end
 
   def assignees
-    @data['assignees']
+    @assignees ||= @data['assignees'].map { |assignee| assignee['login'] }
   end
 
   def id
@@ -15,7 +16,7 @@ class PullRequest
   end
 
   def number
-    @data['number']
+    @data['number'].to_i
   end
 
   def author
@@ -23,26 +24,14 @@ class PullRequest
   end
 
   def assigned?
-    assignees.count >= ASSIGNEES_ENOUGH
+    assignees.count >= Pleasebot.min_assignees
   end
 
-  def assignable?
-    assigned? && @redis.get(id).nil?
+  def assignees_except_author
+    @assignees_except_author ||= assignees - [author]
   end
 
-  def random_assignees
-    (assignees.map { |assignee| assignee['login'] } - [author]).sample(2)
-  end
-
-  def assign!
-    puts "Rolling the dice... *drum roll*..."
-    assignees = random_assignees
-    @octokit.request_pull_request_review(@repo.full_name, number.to_i, assignees,
-                                       accept: 'application/vnd.github.black-cat-preview')
-    people = assignees.map { |assignee| "@#{assignee}" }.join(' ')
-    @octokit.add_comment(@repo.full_name, number.to_i,
-                          "Hey @#{author}, thanks for assigning people to this pull request!" \
-                          " #{people} were requested to review this on your behalf.")
-    @redis.set(id, true)
+  def valid?
+    PullRequestValidator.valid?(self)
   end
 end

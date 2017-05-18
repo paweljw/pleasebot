@@ -1,0 +1,22 @@
+AllCops:
+  TargetRubyVersion: 2.4
+
+LineLength:
+  Max: 125
+
+StringLiterals:
+  EnforcedStyle: single_quotes
+
+ClassLength:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+AllCops:
+  Exclude:
+    - spec/**/*
+
+BlockLength:
+  Exclude:
+    - config/routes.rb
