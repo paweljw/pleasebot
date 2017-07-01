@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative './base_command'
 require_relative './request_reviews_command'
 require_relative './comment_command'
 
@@ -9,11 +10,7 @@ require_relative './../redis_service'
 require_relative './../pull_request'
 require_relative './../repository'
 
-class PleaseCommand
-  def self.call(payload)
-    new(payload).call
-  end
-
+class PleaseCommand < BaseCommand
   def initialize(payload)
     @payload = payload
   end

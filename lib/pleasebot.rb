@@ -10,16 +10,20 @@ class Pleasebot
       @people_in_team ||= ENV.fetch('PEOPLE_IN_TEAM', 4).to_i
     end
 
+    def managed_repositories
+      @managed_repositories ||= ENV.fetch('MANAGED_REPOSITORIES', '').split(',')
+    end
+
     def min_assignees
       @min_assignees ||= people_in_team - 1
     end
 
-    def access_token
-      @access_token ||= ENV['ACCESS_TOKEN']
+    def reviewers
+      @reviewers ||= ENV.fetch('MIN_REVIEWERS', 2).to_i
     end
 
-    def secret
-      @secret ||= ENV['SECRET']
+    def access_token
+      @access_token ||= ENV['ACCESS_TOKEN']
     end
   end
 end

@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-class RequestReviewsCommand
-  def self.call(repository, pull_request)
-    new(repository, pull_request).call
-  end
+require_relative './base_command'
 
+class RequestReviewsCommand
   def initialize(repository, pull_request)
     @repository = repository
     @pull_request = pull_request
@@ -14,15 +12,15 @@ class RequestReviewsCommand
     Github.instance.request_pull_request_review(
       @repository.full_name,
       @pull_request.number,
-      random_reviewers,
+      least_busy_developers.map(&:first),
       accept: 'application/vnd.github.black-cat-preview'
     )
-    random_reviewers
+    least_busy_developers
   end
 
   private
 
-  def random_reviewers
-    @random_reviewers ||= @pull_request.assignees_except_author.sample(2)
+  def least_busy_developers
+    @least_busy_developers ||= Github.instance.least_requested_reviewers(@pull_request.assignees_except_author, 2)
   end
 end

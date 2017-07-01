@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-class CommentCommand
-  def self.call(repository, pull_request, reviewers)
-    new(repository, pull_request, reviewers).call
-  end
+require_relative './base_command'
 
+class CommentCommand < BaseCommand
   def initialize(repository, pull_request, reviewers)
     @repository = repository
     @pull_request = pull_request
@@ -22,7 +20,7 @@ class CommentCommand
   end
 
   def reviewers
-    @reviewers.map { |reviewer| "@#{reviewer}" }.join(' ')
+    @reviewers.map { |reviewer, count| "@#{reviewer} (#{count + 1})" }.join(' and ')
   end
 
   def author
