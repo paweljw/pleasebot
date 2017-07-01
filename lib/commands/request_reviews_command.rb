@@ -2,7 +2,7 @@
 
 require_relative './base_command'
 
-class RequestReviewsCommand
+class RequestReviewsCommand < BaseCommand
   def initialize(repository, pull_request)
     @repository = repository
     @pull_request = pull_request
